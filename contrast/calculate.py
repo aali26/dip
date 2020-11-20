@@ -51,8 +51,14 @@ class Calculate:
     def redConstant(self, color, dRL, cg, cb):
         return (dRL - (0.7152 * color[1] * cg) - (0.0722 * color[2] * cb)) / (0.2126 * color[0]);
 
-    def desiredRelativeLuminance(self, contrast):
+    def desiredRelativeLuminance(self, color, contrast):
         return (1.05 / contrast) - 0.05;
+
+    def currentRelativeLuminance(self, color):
+        return (0.2126 * color[0]) + (0.7152 * color[1]) + (0.0722 * color[2]);
+
+    def currentContrast(self, color):
+        return 1.05 / (self.currentRelativeLuminance(color) + 0.05)
 
     def luminanceConstant(self, color, dRL):
         channelConstant = dRL / ((0.2126 * color[0]) + (0.7152 * color[1]) + (0.0722 * color[2]));
@@ -64,7 +70,12 @@ class Calculate:
         ];
 
     def constant(self, color, contrast):
-        dRL = self.desiredRelativeLuminance(contrast);
+        currentContrast = self.currentContrast(color);
+        desiredContrast = currentContrast - contrast
+        if (desiredContrast < 0):
+            desiredContrast = currentContrast + contrast
+            
+        dRL = self.desiredRelativeLuminance(color, desiredContrast);
 
         constant = self.luminanceConstant(color, dRL);
         minConstant = self.MinConstant(color);

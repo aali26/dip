@@ -80,9 +80,11 @@ def writeContrastCaption(imageRGB, imageContrast, textImage, x, y, width, height
 def testContrast():
     x = 20
     y = 20
-    rgb, hsv = openImage('image4.png')
+    rgb, hsv = openImage('Capture.png')
     textImage, width, height = createTextCanvas("Ayman", rgb, 0, x, y)
     newImageRGB = convertImageToContrast(rgb.copy(), 4.5)
+    plt.imshow(newImageRGB)
+    plt.show()
     writtenImage = writeContrastCaption(rgb, newImageRGB, textImage, x, y, width, height)
     plt.imshow(writtenImage)
     plt.show()
@@ -90,7 +92,7 @@ def testContrast():
 def testHSV():
     x = 20
     y = 20
-    rgb, hsv = openImage('image4.png')
+    rgb, hsv = openImage('Capture.png')
     textImage, width, height = createTextCanvas("Ayman", rgb, 0, x, y)
     writtenImage = writeCaption(rgb, hsv, textImage, x, y, width, height)
     plt.imshow(writtenImage)
