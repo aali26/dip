@@ -15,6 +15,15 @@ def openImage(image):
     imageHSV = cv2.cvtColor(imageBGR, cv2.COLOR_BGR2HSV)
     return imageRGB, imageHSV
 
+def showImage(img, img2 = None):
+    if (img2.any()):
+        plt.subplot(1,2,1);
+        plt.imshow(img);
+        plt.subplot(1,2,2);
+        plt.imshow(img2);
+    else:
+        plt.imshow(img);
+    plt.show();
 
 def createTextCanvas(text, image, fontIndex, x, y):
     # getTextSize(text, Font, Scale, Thickness)
@@ -77,30 +86,28 @@ def writeContrastCaption(imageRGB, imageContrast, textImage, x, y, width, height
         imageRGB[i[0], i[1], :] = imageInverse[i[0], i[1], :]
     return imageRGB;
 
-def testContrast():
-    x = 20
-    y = 20
-    rgb, hsv = openImage('Capture.png')
-    textImage, width, height = createTextCanvas("Ayman", rgb, 0, x, y)
-    newImageRGB = convertImageToContrast(rgb.copy(), 4.5)
-    plt.imshow(newImageRGB)
-    plt.show()
+def testContrast(image_name, text, x, y, contrast = 7.5):
+    rgb, hsv = openImage(image_name)
+    textImage, width, height = createTextCanvas(text, rgb, 0, x, y)
+    newImageRGB = convertImageToContrast(rgb.copy(), contrast)
     writtenImage = writeContrastCaption(rgb, newImageRGB, textImage, x, y, width, height)
-    plt.imshow(writtenImage)
-    plt.show()
+    return writtenImage;
 
-def testHSV():
-    x = 20
-    y = 20
-    rgb, hsv = openImage('Capture.png')
-    textImage, width, height = createTextCanvas("Ayman", rgb, 0, x, y)
+def testHSV(image_name, text, x, y):
+    rgb, hsv = openImage(image_name)
+    textImage, width, height = createTextCanvas(text, rgb, 0, x, y)
     writtenImage = writeCaption(rgb, hsv, textImage, x, y, width, height)
-    plt.imshow(writtenImage)
-    plt.show()
+    return writtenImage;
 
-testHSV();
-testContrast();
+image = 'image3.png';
+text = "ayman";
+x = 50;
+y = 50;
 
+hsvImage = testHSV(image, text, x, y);
+contrastImage = testContrast(image, text, x, y);
+
+showImage(hsvImage, contrastImage);
 # frame = np.ones([400,400,3])*255
 # lbls = ['standUp', 'front', 'lookU', 'lookF', 'lookDF', 'HandOnHipR']
 
