@@ -47,26 +47,6 @@ def createTextCanvas(text, image, fontIndex, x, y):
         );
         return blankImage, width, height
 
-def convertImageToContrast(imageRGB, contrast=4.5):
-    # get all unique colors
-    colors = np.unique(imageRGB.reshape(-1, imageRGB.shape[2]),axis=0)
-    print(len(colors), " unique colors");
-    # get contrasts of all colors
-    new_colors = [];
-    for color in colors:
-        contrast_color = Convert().transform(color / 256, contrast)
-        new_colors.append((np.array(contrast_color) * 256).astype("uint8"));
-
-    # convert each pixel of current image to use the new colors
-    red, green, blue = imageRGB[:,:,0], imageRGB[:,:,1], imageRGB[:,:,2]
-    for i in range(0, len(colors)):
-        color = colors[i];
-        mask = (red == color[0]) & (green == color[1]) & (blue == color[2])
-        imageRGB[:,:,:3][mask] = new_colors[i]
-
-    return imageRGB;
-
-
 def writeCaption(imageRGB, imageHSV, textImage, x, y, width, height):
     imagePatch = imageRGB[x:x+height, y:y+width, :]
     imageInverse = cv2.bitwise_not(imageHSV)
@@ -86,16 +66,18 @@ def writeContrastCaption(imageRGB, imageContrast, textImage, x, y, width, height
         imageRGB[i[0], i[1], :] = imageInverse[i[0], i[1], :]
     return imageRGB;
 
-def testContrast(image_name, text, x, y, contrast = 7.5):
+def testContrast(image_name, text, x, y, contrast = 15.0):
     rgb, hsv = openImage(image_name)
     textImage, width, height = createTextCanvas(text, rgb, 0, x, y)
-    newImageRGB = convertImageToContrast(rgb.copy(), contrast)
+    newImageRGB = Convert().image(rgb.copy(), contrast)
+    # showImage(newImageRGB);
     writtenImage = writeContrastCaption(rgb, newImageRGB, textImage, x, y, width, height)
     return writtenImage;
 
 def testHSV(image_name, text, x, y):
     rgb, hsv = openImage(image_name)
     textImage, width, height = createTextCanvas(text, rgb, 0, x, y)
+    # showImage(hsv);
     writtenImage = writeCaption(rgb, hsv, textImage, x, y, width, height)
     return writtenImage;
 
@@ -103,11 +85,48 @@ image = 'image3.png';
 text = "ayman";
 x = 50;
 y = 50;
-
 hsvImage = testHSV(image, text, x, y);
 contrastImage = testContrast(image, text, x, y);
-
 showImage(hsvImage, contrastImage);
+
+# size = 250
+# blank_image = np.zeros((size,size,3))
+# red = blank_image.copy();
+# red[:,:,0] = 255
+# plt.imsave("images/red.png", red);
+# green = blank_image.copy();
+# green[:,:,1] = 255
+# plt.imsave("images/green.png", green);
+# blue = blank_image.copy();
+# blue[:,:,2] = 255
+# plt.imsave("images/blue.png", blue);
+# magenta = blank_image.copy();
+# magenta[:,:,0] = 255
+# magenta[:,:,2] = 255
+# plt.imsave("images/magenta.png", magenta);
+# cyan = blank_image.copy();
+# cyan[:,:,1] = 255
+# cyan[:,:,2] = 255
+# plt.imsave("images/cyan.png", cyan);
+# yellow = blank_image.copy();
+# yellow[:,:,0] = 255
+# yellow[:,:,1] = 255
+# plt.imsave("images/yellow.png", yellow);
+# white = blank_image.copy();
+# white[:,:,0] = 255
+# white[:,:,1] = 255
+# white[:,:,2] = 255
+# plt.imsave("images/white.png", white);
+# gray = blank_image.copy();
+# gray[:,:,0] = 128
+# gray[:,:,1] = 128
+# gray[:,:,2] = 128
+# plt.imsave("images/gray.png", gray);
+# black = blank_image.copy();
+# plt.imsave("images/black.png", black);
+
+
+# showImage(hsvImage, contrastImage);
 # frame = np.ones([400,400,3])*255
 # lbls = ['standUp', 'front', 'lookU', 'lookF', 'lookDF', 'HandOnHipR']
 
