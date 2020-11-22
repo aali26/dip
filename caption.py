@@ -5,14 +5,10 @@ import numpy as np
 import math
 from contrast.convert import Convert
 
-fonts = ["font_Hershey_Simplex", "font_Hershey_Plain", "font_Hershey_Duplex",
-         "font_Hershey_Complex", "font_Hershey_Triplex", "font_Hershey_Complex_Small",
-         "font_Hershey_Script_Simplex", "font_Hershey_Script_Complex"]
-
 def openImage(image):
-    imageBGR = cv2.imread(os.path.join("images", image))
-    imageRGB = cv2.cvtColor(imageBGR, cv2.COLOR_BGR2RGB)
-    imageHSV = cv2.cvtColor(imageBGR, cv2.COLOR_BGR2HSV)
+    # imageBGR = cv2.imread(os.path.join("images", image))
+    imageRGB = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
+    imageHSV = cv2.cvtColor(image, cv2.COLOR_BGR2HSV)
     return imageRGB, imageHSV
 
 def showImage(img, img2 = None):
@@ -25,10 +21,24 @@ def showImage(img, img2 = None):
         plt.imshow(img);
     plt.show();
 
-def createTextCanvas(text, image, fontIndex, x, y):
+
+def createTextCanvas(text, image, fontIndex, x, y, textProperties):
     # getTextSize(text, Font, Scale, Thickness)
-    font = fonts[fontIndex].upper()
-    (width, height), baseline = cv2.getTextSize(text, cv2.FONT_HERSHEY_COMPLEX, 2, 3)
+    textProperties['font_family']
+    if textProperties['font_family'] and int(textProperties['font_family']) < 8:
+        textProperties['font_family'] = int(textProperties['font_family'])
+    else:
+        textProperties['font_family'] = 0
+    if textProperties['font_size'] == 1:
+        scale = 2
+        thickness = 2
+    elif textProperties['font_size'] == 2:
+        scale = 2
+        thickness = 3
+    else:
+        scale = 2
+        thickness = 3
+    (width, height), baseline = cv2.getTextSize(text, textProperties['font_family'], scale, thickness)
     if image.shape[1] < height or image.shape[0] < width:
         return -1
     else:
@@ -38,10 +48,10 @@ def createTextCanvas(text, image, fontIndex, x, y):
             blankImage,
             text,
             (x, height + y),
-            cv2.FONT_HERSHEY_COMPLEX,
-            2,
+            textProperties['font_family'],
+            scale,
             (255, 255, 255),
-            3,
+            thickness,
             cv2.LINE_AA,
             False
         );
@@ -66,114 +76,18 @@ def writeContrastCaption(imageRGB, imageContrast, textImage, x, y, width, height
         imageRGB[i[0], i[1], :] = imageInverse[i[0], i[1], :]
     return imageRGB;
 
-def testContrast(image_name, text, x, y, contrast = 15.0):
+
+def testContrast(image_name, text, x, y, textProperties, contrast = 15.0):
     rgb, hsv = openImage(image_name)
-    textImage, width, height = createTextCanvas(text, rgb, 0, x, y)
+    textImage, width, height = createTextCanvas(text, rgb, 0, x, y, textProperties)
     newImageRGB = Convert().image(rgb.copy(), contrast)
     # showImage(newImageRGB);
     writtenImage = writeContrastCaption(rgb, newImageRGB, textImage, x, y, width, height)
     return writtenImage;
 
-def testHSV(image_name, text, x, y):
+def testHSV(image_name, text, x, y, textProperties):
     rgb, hsv = openImage(image_name)
-    textImage, width, height = createTextCanvas(text, rgb, 0, x, y)
+    textImage, width, height = createTextCanvas(text, rgb, 0, x, y, textProperties)
     # showImage(hsv);
     writtenImage = writeCaption(rgb, hsv, textImage, x, y, width, height)
     return writtenImage;
-
-image = 'image3.png';
-text = "ayman";
-x = 50;
-y = 50;
-hsvImage = testHSV(image, text, x, y);
-contrastImage = testContrast(image, text, x, y);
-showImage(hsvImage, contrastImage);
-
-# size = 250
-# blank_image = np.zeros((size,size,3))
-# red = blank_image.copy();
-# red[:,:,0] = 255
-# plt.imsave("images/red.png", red);
-# green = blank_image.copy();
-# green[:,:,1] = 255
-# plt.imsave("images/green.png", green);
-# blue = blank_image.copy();
-# blue[:,:,2] = 255
-# plt.imsave("images/blue.png", blue);
-# magenta = blank_image.copy();
-# magenta[:,:,0] = 255
-# magenta[:,:,2] = 255
-# plt.imsave("images/magenta.png", magenta);
-# cyan = blank_image.copy();
-# cyan[:,:,1] = 255
-# cyan[:,:,2] = 255
-# plt.imsave("images/cyan.png", cyan);
-# yellow = blank_image.copy();
-# yellow[:,:,0] = 255
-# yellow[:,:,1] = 255
-# plt.imsave("images/yellow.png", yellow);
-# white = blank_image.copy();
-# white[:,:,0] = 255
-# white[:,:,1] = 255
-# white[:,:,2] = 255
-# plt.imsave("images/white.png", white);
-# gray = blank_image.copy();
-# gray[:,:,0] = 128
-# gray[:,:,1] = 128
-# gray[:,:,2] = 128
-# plt.imsave("images/gray.png", gray);
-# black = blank_image.copy();
-# plt.imsave("images/black.png", black);
-
-
-# showImage(hsvImage, contrastImage);
-# frame = np.ones([400,400,3])*255
-# lbls = ['standUp', 'front', 'lookU', 'lookF', 'lookDF', 'HandOnHipR']
-
-# offset = 35
-# x,y = 50,50
-# for idx,lbl in enumerate(lbls):
-#     print(x,y+offset*idx)
-#     cv2.putText(frame, str(lbl), (x,y+offset*idx), cv2.FONT_HERSHEY_SIMPLEX, 1, (0,0,0), 2)
-
-# plt.imshow(frame)
-# plt.show()
-
-# plt.imshow(textImage)
-# plt.show()
-# blankImage = 0 * np.ones(shape=[255, 255, 3], dtype=np.uint8)
-# imagePatchRGB = imageRGB[200:200+255, 200:200+255, :]
-# imagePatch = imageHSV[150:100+255, 150:100+255, :]
-# cv2.putText(blankImage, 'Hello', (10, 140), cv2.FONT_HERSHEY_COMPLEX, 2, (255, 255, 255), 2, cv2.LINE_AA)
-#
-# indices = np.where(np.all(blankImage == 255, axis=-1))
-# # print indices
-# coordinates = [*zip(indices[0], indices[1])]
-# # for i in coordinates:
-# #     blankImage[i[0], i[1], :] = imagePatch[i[0], i[1], :]
-# #     imagePatch[i[0], i[1], :] = imagePatch[i[0], i[1], :] + 50
-# # plt.imshow(blankImage)
-# hueLayer = imageRGB[:, :, 0]
-# saturationLayer = imageRGB[:, :, 1]
-# valueLayer = imageRGB[:, :, 2]
-# f, (ax1, ax2, ax3) =  plt.subplots(1, 3, figsize=(20, 10))
-# ax1.set_title("Hue Channel ")
-# ax1.imshow(hueLayer)
-# ax2.set_title("Saturation Channel ")
-# ax2.imshow(saturationLayer)
-# ax3.set_title("value Channel ")
-# ax3.imshow(valueLayer)
-# for i in coordinates:
-#     blankImage[i[0], i[1], :] = imagePatch[i[0], i[1], 0]
-#     imagePatchRGB[i[0], i[1], :] = imagePatchRGB[i[0], i[1], 2]
-#     imagePatchRGB[i[0], i[1], :] = imageHSV[i[0], i[1], 0]
-#     # if imageHSV[i[0], i[1], 2] > 128:
-#     #     imagePatchRGB[i[0], i[1], :] = 255 - imageHSV[i[0], i[1], 2]
-#     # else:
-#     #     imagePatchRGB[i[0], i[1], :] = 0 + imageHSV[i[0], i[1], 2]
-# # plt.imshow(imagePatchRGB)
-# plt.show()
-# cv2.imwrite(os.path.join("image", "output.png"), imagePatchRGB)
-# size = cv2.getTextSize("Hello",cv2.FONT_HERSHEY_COMPLEX,2,3)
-# print(size)
-# print(Convert().transform([0,0,1.0], 4.5))
