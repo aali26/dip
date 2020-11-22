@@ -1,1 +1,4 @@
 # READ ME
+
+conda install boto3
+conda install -c nmcginn asyncio

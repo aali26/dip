@@ -25,6 +25,40 @@ def showImage(img, img2 = None):
         plt.imshow(img);
     plt.show();
 
+def smoothing_title_box(my_image, subtitle_position_height0, subtitle_position_height1,subtitle_position_width0,subtitle_position_width1, alpha = 1):
+    # subtitle_position_height0, subtitle_position_height1,subtitle_position_width0,subtitle_position_width1 = 130, 146, 150,550
+    im_h, im_w = abs(subtitle_position_height1-subtitle_position_height0) , abs(subtitle_position_width1 - subtitle_position_width0)
+    bl_h, bl_w = 8, 8
+    #alpha is number of standard deviation from mean intensity of block (bl_h, bh_w) which we wants remove the outlayer intensities from orginal image.   
+    dct_after_std_all_blocks = np.zeros(my_image.shape)
+    for channel in range(3):
+        for row in np.arange(im_h - bl_h + 1, step=bl_h):
+            for col in np.arange(im_w - bl_w + 1 , step = bl_w):
+                block = my_image[subtitle_position_height0 + row:subtitle_position_height0 + row + bl_h, subtitle_position_width0 + col:subtitle_position_width0 + col + bl_w, channel].copy()
+                block[np.logical_or((block > np.mean(block) + alpha*np.std(block)), (block < np.mean(block)-alpha*np.std(block)))] = np.mean(block)
+                dct_after_std_all_blocks[subtitle_position_height0 + row :subtitle_position_height0 + row + bl_h, subtitle_position_width0 + col :subtitle_position_width0 + col + bl_w, channel] = cv2.dct(block)
+
+    idct_after_std_all_blocks = np.zeros(my_image.shape)    
+    for channel in range(3):
+        for row in np.arange(im_h - bl_h + 1, step=bl_h):
+          for col in np.arange(im_w - bl_w + 1 , step = bl_w):  
+              idct_after_std_all_blocks[subtitle_position_height0 + row: subtitle_position_height0 + row + bl_h, subtitle_position_width0 + col : subtitle_position_width0 + col + bl_w, channel] = cv2.idct(dct_after_std_all_blocks[subtitle_position_height0 + row :subtitle_position_height0 + row + bl_h, subtitle_position_width0 + col: subtitle_position_width0 + col+bl_w, channel])          
+    
+    new_image = my_image.copy()
+    new_image[subtitle_position_height0 : subtitle_position_height1,subtitle_position_width0 : subtitle_position_width1, :] = idct_after_std_all_blocks[subtitle_position_height0 : subtitle_position_height1,subtitle_position_width0 : subtitle_position_width1, :]
+    color = [0, 0, 0]
+    new_image[subtitle_position_height0 : subtitle_position_height0 + 1, subtitle_position_width0 : subtitle_position_width1 , :] = color
+    new_image[subtitle_position_height1 -1 : subtitle_position_height1 , subtitle_position_width0 : subtitle_position_width1 , :] = color    
+    new_image[ subtitle_position_height0 : subtitle_position_height1, subtitle_position_width0 : subtitle_position_width0 + 1 , :] = color    
+    new_image[ subtitle_position_height0 : subtitle_position_height1, subtitle_position_width1 -1 : subtitle_position_width1 , :] = color    
+
+    fig, (ax1, ax2) = plt.subplots(1,2)
+    ax1.imshow(my_image, cmap='gray'); ax1.title.set_text('original')
+    ax2.imshow(new_image, cmap='gray'); ax2.title.set_text('after smooting outlayers')
+    fig.suptitle('the averaging the image which has higher or lower value than {alpha} standard deviation from mean')
+    plt.show()
+    return new_image
+
 def createTextCanvas(text, image, fontIndex, x, y):
     # getTextSize(text, Font, Scale, Thickness)
     font = fonts[fontIndex].upper()
@@ -77,8 +111,8 @@ def testContrast(image_name, text, x, y, contrast = 15.0):
 def testHSV(image_name, text, x, y):
     rgb, hsv = openImage(image_name)
     textImage, width, height = createTextCanvas(text, rgb, 0, x, y)
-    # showImage(hsv);
-    writtenImage = writeCaption(rgb, hsv, textImage, x, y, width, height)
+    # newHSV = smoothing_title_box(hsv, y, x , y + height, x + width, alpha= 1)
+    writtenImage = writeCaption(rgb, newHSV, textImage, x, y, width, height)
     return writtenImage;
 
 image = 'image3.png';
@@ -86,8 +120,9 @@ text = "ayman";
 x = 50;
 y = 50;
 hsvImage = testHSV(image, text, x, y);
-contrastImage = testContrast(image, text, x, y);
-showImage(hsvImage, contrastImage);
+showImage(hsvImage);
+# contrastImage = testContrast(image, text, x, y);
+# showImage(hsvImage, contrastImage);
 
 # size = 250
 # blank_image = np.zeros((size,size,3))
