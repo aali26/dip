@@ -2,3 +2,5 @@
 /lib/
 .ipynb_checkpoints
 contrast/__pycache__
+aws/__pycache__
+__pycache__
