@@ -149,14 +149,14 @@ def testHSV(image_name, text, x, y, textProperties):
     writtenImage = writeCaption(rgb, hsv, textImage, x, y, width, height)
     return writtenImage;
 
-def testContrast(image, text, x, y, textProperties, contrast = 15.0):
+def contrast(image, text, x, y, textProperties, contrast = 15.0):
     rgb, hsv = cleanImage(image)
     textImage, width, height = createTextCanvas(text, rgb, 0, x, y, textProperties)
     newImageRGB = Convert().image(rgb.copy(), contrast)
     writtenImage = writeContrastCaption(rgb, newImageRGB, textImage, x, y, width, height)
     return writtenImage;
 
-def testHSV(image, text, x, y, textProperties):
+def HSV(image, text, x, y, textProperties):
     rgb, hsv = cleanImage(image)
     textImage, width, height = createTextCanvas(text, rgb, 0, x, y, textProperties)
     writtenImage = writeCaption(rgb, hsv, textImage, x, y, width, height)

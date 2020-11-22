@@ -53,7 +53,7 @@ def createCaption(args):
         for i in range(0, endFrame):
             if i >= baseFrame:
                 if args.hsv_inverse:
-                    videoHandler.write(caption.testHSV(
+                    videoHandler.write(caption.HSV(
                         videoInfo['frames'][baseFrame],
                         args.text_caption,
                         args.x_coordinate,
@@ -62,14 +62,15 @@ def createCaption(args):
                     ))
                 else:
                     videoHandler.write(
-                        caption.testContrast(
+                        caption.contrast(
                             videoInfo['frames'][baseFrame],
                             args.text_caption,
                             args.x_coordinate,
                             args.y_coordinate,
-                            args.contrast_level,
-                            textProperties
-                        ))
+                            textProperties,
+                            args.contrast_level
+                        )
+                    );
 
             else:
                 videoHandler.write(videoInfo['frames'][i])
@@ -80,7 +81,7 @@ def createCaption(args):
             if i >= baseFrame and i <= endFrame:
                 if args.hsv_inverse:
                     videoHandler.write(
-                        caption.testHSV(
+                        caption.HSV(
                             videoInfo['frames'][i],
                             args.text_caption,
                             args.x_coordinate,
@@ -89,7 +90,7 @@ def createCaption(args):
                         ))
                 else:
                     videoHandler.write(
-                        caption.testContrast(
+                        caption.contrast(
                             videoInfo['frames'][i],
                             args.text_caption,
                             args.x_coordinate,
