@@ -1,3 +1,11 @@
+# 6134 Digital Image Processing Project 1
+
+## Authors
+
+Ayman Ali, Christian Micklisch, and Moe Nagahisarchoghaei.
+
+## How to run the project.
+
 To run the HSV inversion method.
 
 ```bash
@@ -32,3 +40,7 @@ $ python main.py \
     -fs 1\
     -cl 15.0
 ```
+
+## Explanation of methods
+
+An explanation of the methods utilized, HSV Inversion and Contrast Transformation, are covered in the **Masking-Methods.pdf** file in the repo. Jupyter Notebook was utilized in creating the file and is runnable under **Masking-Methods.ipynb**.
